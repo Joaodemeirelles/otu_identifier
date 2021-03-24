@@ -113,7 +113,8 @@ FAMILY_ENCODE = {
 class FamilyEncoder:
 
     def encode(self, family: str) -> Any:
-        """Encodes Family category into One Hot Enconding to feed DL model.
+        """
+        Encodes Family category into One Hot Enconding to feed DL model.
 
         Parameters
         ----------
@@ -129,7 +130,10 @@ class FamilyEncoder:
         """
         family_array = np.array(list(family.lower()))
         onehot_encoded = []
+        print(family_array)
         for ch in family_array:
+            if ch == " ":
+                continue
             ch_encoded = FAMILY_ENCODE[ch]
             onehot_encoded.append(ch_encoded)
         return onehot_encoded
