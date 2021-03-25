@@ -3,4 +3,4 @@ python:
   - "3.8"
 
 script:
-  - flake8 && python3 -m unittest tests/test_encoders.py
+  - flake8 && python3 -m unittest otu_identifier/tests/test_encoders.py
