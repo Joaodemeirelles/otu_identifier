@@ -2,8 +2,8 @@ import unittest
 import numpy as np
 
 
-from encoders.dna_encoder import DnaEncoder
-from encoders.family_encoder import FamilyEncoder
+from otu_identifier.encoders.dna_encoder import DnaEncoder
+from otu_identifier.encoders.family_encoder import FamilyEncoder
 
 
 class TestDnaEncoder(unittest.TestCase):
