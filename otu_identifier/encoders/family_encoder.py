@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Any
+from torch import from_numpy
 
 
 FAMILY_ENCODE = {
@@ -130,10 +131,10 @@ class FamilyEncoder:
         """
         family_array = np.array(list(family.lower()))
         onehot_encoded = []
-        print(family_array)
         for ch in family_array:
             if ch == " ":
                 continue
             ch_encoded = FAMILY_ENCODE[ch]
-            onehot_encoded.append(ch_encoded)
+            onehot_encoded.append(from_numpy(ch_encoded.astype(np.float32)))
+
         return onehot_encoded

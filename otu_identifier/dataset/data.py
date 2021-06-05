@@ -1,58 +1,73 @@
-import pandas as pd
+import torch
 from pathlib import Path
-from typing import Any, List
-from otu_identifier.encoders.dna_encoder import DnaEncoder
-from otu_identifier.encoders.family_encoder import FamilyEncoder
+from typing import List
+from otu_identifier.encoders.dna_encoder import KmerEncoder
+from otu_identifier.encoders.domain_encoder import DomainEncoder
+from otu_identifier.model.models import OtuIdentifyNet
+import pytorch_lightning as pl
 
 
-class Database:
-    """ Class to store FASTA database data """
+class SeqDataset(torch.utils.data.Dataset):
+    """ Dataset to store seq database data """
 
-    def __init__(self, filename):
-        self.path = Path(filename)
+    def __init__(self, filename: Path):
+        x, y = self.read_fasta(filename=Path(filename))
+        self.target = 256
+        self.X = x
+        self.y = y
 
-    def read_fasta(self) -> List:
+    def read_fasta(self, filename: Path) -> List:
         """
         Method do read fasta defined in struct init.
 
         Parameters
         ----------
+        filename: Path, required
+            Filename with fasta sequences used to train model
 
         Returns
         -------
         dataset : List[List[str, str]], required
             Dataset list with each sequence and it's header.
         """
-        dataset = []
-        with open(self.path, "r") as file:
+        x = []
+        y = []
+        with open(filename, "r") as file:
             lines = file.readlines()
         for i in range(0, len(lines), 2):
-            header = lines[i].replace("\n", "").replace(">", "")
-            header_encoded = FamilyEncoder().encode(family=header)
+            domain = lines[i].split()[1].replace("\n", "")
+            domain_encoded = DomainEncoder().encode(domain=domain)
             sequence = lines[i+1].replace("\n", "")
-            seq_encoded = DnaEncoder().encode(sequence=sequence)
-            dataset.append([header_encoded, seq_encoded])
+            try:
+                seq_encoded = KmerEncoder(4).\
+                    obtain_kmer_feature_for_one_sequence(
+                        sequence,
+                        write_number_of_occurrences=False
+                )
+            except Exception as e:
+                print(e)
+                continue
+            seq_encoded = torch.tensor(seq_encoded, dtype=torch.float32)
 
-        return dataset
+            x.append(seq_encoded)
+            y.append(domain_encoded)
 
-    def file_to_df(self, dataset: List) -> Any:
-        """Method to transform dataset into Pandas DataFrame.
+        return x, y
 
-        Parameters
-        ----------
-        dataset : List[List[str, str]], required
-            Dataset list with each sequence and it's header.
+    def __len__(self):
+        return len(self.X)
 
-        Returns
-        -------
-        df
-            Pandas dataframe with every dataset sequence and family.
-        """
-        df = pd.DataFrame(dataset, columns=["family", "sequence"])
-        return df
+    def __getitem__(self, idx):
+        if isinstance(idx, torch.Tensor):
+            idx = idx.tolist()
+
+        return self.X[idx], self.y[idx]
 
 
-teste = Database(filename="../16s_family.fasta")
-dataset = teste.read_fasta()
-df = teste.file_to_df(dataset)
-print(df.head())
+def seq_to_input(seq):
+    """"""
+    seq_encoded = KmerEncoder(4).obtain_kmer_feature_for_one_sequence(
+        seq,
+        write_number_of_occurrences=False
+    )
+    return torch.tensor(seq_encoded, dtype=torch.float32)
