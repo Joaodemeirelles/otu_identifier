@@ -135,6 +135,6 @@ class FamilyEncoder:
             if ch == " ":
                 continue
             ch_encoded = FAMILY_ENCODE[ch]
-            onehot_encoded.append(from_numpy(ch_encoded.astype(np.float32)))
+            onehot_encoded.append(ch_encoded.astype(np.float32))
 
         return onehot_encoded
