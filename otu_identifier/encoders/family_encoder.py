@@ -1,6 +1,5 @@
 import numpy as np
 from typing import Any
-from torch import from_numpy
 
 
 FAMILY_ENCODE = {
