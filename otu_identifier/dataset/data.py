@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import List
 from otu_identifier.encoders.dna_encoder import KmerEncoder
 from otu_identifier.encoders.domain_encoder import DomainEncoder
-from otu_identifier.model.models import OtuIdentifyNet
-import pytorch_lightning as pl
 
 
 class SeqDataset(torch.utils.data.Dataset):
