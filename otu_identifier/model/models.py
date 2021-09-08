@@ -8,12 +8,14 @@ class OtuIdentifyNet(pl.LightningModule):
         super().__init__()
         self.lin1 = nn.Linear(256, 84)
         self.act1 = nn.LeakyReLU(inplace=True)
+        self.dropout1 = nn.Dropout(0.2)
         self.lin2 = nn.Linear(84, 84)
         self.act2 = nn.LeakyReLU(inplace=True)
         self.lin3 = nn.Linear(84, 1)
 
     def forward(self, x):
         out = self.act1(self.lin1(x))
+        out = self.dropout1(out)
         out = self.act2(self.lin2(out))
         out = self.lin3(out)
         return out
